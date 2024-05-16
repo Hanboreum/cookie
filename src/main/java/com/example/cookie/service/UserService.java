@@ -14,7 +14,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     //login logic
-    public void login(LoginRequest loginRequest, HttpServletResponse httpServletResponse){
+    public String login(LoginRequest loginRequest, HttpServletResponse httpServletResponse){
 
         var id = loginRequest.getId();
         var pw = loginRequest.getPassword();
@@ -28,16 +28,11 @@ public class UserService {
                 //userDto의 pw 가 넘어온 pw와 동일하다면
                 //쿠키에 해당 정보를 저장
                 var cookie = new Cookie("authorization-cookie", userDto.getId());
-                cookie.setDomain("localhost"); //도메인 지정
-                cookie.setPath("/");// root 지정
-                cookie.setHttpOnly(true); //자바스크립트에서 해당 값 읽을 수 없게 보안 처리
-                cookie.setSecure(true); // https 에서만 사용되도록 설정
-                cookie.setMaxAge(-1);// 연결된 동안만 사용
-
-                httpServletResponse.addCookie(cookie); // http server response에 쿠키 추가
+               return userDto.getId(); //로그인 성공시 사용자 아이디 리턴
             }
         }else{
             throw new RuntimeException("User Not Found");
         }
+        return null;
     }
 }
