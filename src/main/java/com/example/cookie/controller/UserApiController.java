@@ -6,6 +6,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,14 +21,22 @@ public class UserApiController {
 
     @GetMapping("/me") //http://localhost:8080/api/user/me
     public UserDto me (//userdto 반환
-            HttpServletRequest httpServletRequest
+            HttpServletRequest httpServletRequest,
+                       @CookieValue(name = "authorization-cookie", required = false) //authorization-cookie 이름을 가진 쿠키를 맵핑
+                       String authorizationCookie
     ){
-        var cookies = httpServletRequest.getCookies();
+        log.info("authorization cookie: {}", authorizationCookie);
+
+        //유저 찾기
+        var optionalUserDto = userRepository.findById(authorizationCookie);
+        return optionalUserDto.get(); //유저 없으면 null, 있으면 user dto값
+
+        /*var cookies = httpServletRequest.getCookies();
         if(cookies != null ){
             for( Cookie cookie : cookies){
                 log.info("key:{} , value:{}", cookie.getName(), cookie.getValue());
             }
-        }
-        return  null;
+        }*/
+       // return  null;
     }
 }
